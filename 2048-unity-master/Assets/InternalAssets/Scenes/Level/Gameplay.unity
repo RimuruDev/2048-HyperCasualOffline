@@ -173,6 +173,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 148083957}
+  - component: {fileID: 148083958}
   m_Layer: 0
   m_Name: GameContainer
   m_TagString: Untagged
@@ -195,6 +196,38 @@ Transform:
   m_Father: {fileID: 1424228005}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &148083958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 148083956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c255f5896349eea4e8230f346295d5a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WinPopup:
+    popup: {fileID: 0}
+  DefeatPopup:
+    popup: {fileID: 999796184}
+  EmptyTile: {fileID: 135876, guid: a75f7d8cc56b74672984c18c4b744c73, type: 3}
+  tilePrefabs:
+  - {fileID: 100000, guid: a63e4fabf5943af44a2ab274bed4e9a3, type: 3}
+  - {fileID: 100000, guid: 7dc61a94de7560941909f34f984d75ac, type: 3}
+  - {fileID: 100000, guid: f15017b02d568b944b392ca919ed6f49, type: 3}
+  - {fileID: 100000, guid: c25d83339bcee5244a415d07e7acb8b8, type: 3}
+  - {fileID: 100000, guid: e82d176c58e7c8b4ca7a29634c4d1522, type: 3}
+  - {fileID: 100000, guid: 2de5683b33c9d904ab0216eb7630ee5f, type: 3}
+  - {fileID: 100000, guid: e75acc1a25f3007458f94ea83d1da50d, type: 3}
+  - {fileID: 100000, guid: 85dbe1fe567d1244ebe9a0e0e4e557fa, type: 3}
+  - {fileID: 100000, guid: 0eb939ec6498d5e4fa82447ccfb248bb, type: 3}
+  - {fileID: 100000, guid: 961a2f8aea644f549b271924d9ab8e99, type: 3}
+  - {fileID: 100000, guid: 1dbcafcd2a9d9184b9c799c1eb3aaf8b, type: 3}
+  ScoreText:
+    Current: {fileID: 1297970829}
+    Best: {fileID: 0}
 --- !u!4 &152407529 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 38f5258f4cb80f84eb25fa9947c43686,
@@ -2121,6 +2154,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57586050a64bb3d4aa56fe142019f47f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  score:
+    MaxScore: 2048
+    MinScore: 0
+  matrixTile:
+    Rows: 4
+    Cols: 4
+  newTimeValue:
+    Lowest: 2
+    Highes: 4
+  spacingOffset:
+    Horizontal: -1.65
+    Vertical: 1.65
+  border:
+    Offset: 0.05
+    Spacing: 0.1
+  gameDataContainer: {fileID: 148083958}
   gameOverPanel: {fileID: 999796184}
   noTile: {fileID: 135876, guid: a75f7d8cc56b74672984c18c4b744c73, type: 3}
   scoreText: {fileID: 1297970829}
@@ -2140,21 +2189,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   minSwipeDistance: 10
-  score:
-    MaxScore: 2048
-    MinScore: 0
-  matrixTile:
-    Rows: 4
-    Cols: 4
-  newTimeValue:
-    Lowest: 2
-    Highes: 4
-  spacingOffset:
-    Horizontal: -1.65
-    Vertical: 1.65
-  border:
-    Offset: 0.05
-    Spacing: 0.1
 --- !u!1 &1336197130
 GameObject:
   m_ObjectHideFlags: 0
