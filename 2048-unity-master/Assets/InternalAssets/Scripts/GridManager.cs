@@ -19,15 +19,15 @@ public sealed partial class GridManager : MonoBehaviour
     public LayerMask backgroundLayer;
     public float minSwipeDistance = 10.0f;
 
-    [Header("Debug")]
-    [SerializeField] private float halfTileWidth = 0.55f;
-    [SerializeField] private float spaceBetweenTiles = 1.1f;
+    private float halfTileWidth = 0.55f;
+    private float spaceBetweenTiles = 1.1f;
 
-    [SerializeField] private int points;
-    [SerializeField] private List<GameObject> tiles;
-    [SerializeField] private Rect resetButton;
-    [SerializeField] private Rect gameOverButton;
-    [SerializeField] private Vector2 touchStartPosition = Vector2.zero;
+    private int points;
+
+    private List<GameObject> tiles;
+    private Rect resetButton;
+    private Rect gameOverButton;
+    private Vector2 touchStartPosition = Vector2.zero;
 
     [SerializeField] private State state;
 
