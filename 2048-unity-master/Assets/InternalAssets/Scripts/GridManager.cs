@@ -1,9 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
 using Random = UnityEngine.Random;
-using System;
 
 public sealed partial class GridManager : MonoBehaviour
 {
@@ -20,14 +18,13 @@ public sealed partial class GridManager : MonoBehaviour
     public float minSwipeDistance = 10.0f;
 
     public MatrixTile matrixTile;
-    
-    //private static int rows_ = 4;
-    //private static int cols_ = 4;
-    private static int lowestNewTileValue = 2;
-    private static int highestNewTileValue = 4;
+    public NewTimeValue newTimeValue;
+
     private static float borderOffset = 0.05f;
+
     private static float horizontalSpacingOffset = -1.65f;
     private static float verticalSpacingOffset = 1.65f;
+
     private static float borderSpacing = 0.1f;
     private static float halfTileWidth = 0.55f;
     private static float spaceBetweenTiles = 1.1f;
@@ -208,9 +205,9 @@ public sealed partial class GridManager : MonoBehaviour
         float highOrLowChance = Random.Range(0f, 0.99f);
 
         if (highOrLowChance >= 0.9f)
-            value = highestNewTileValue;
+            value = newTimeValue.Highes;
         else
-            value = lowestNewTileValue;
+            value = newTimeValue.Lowest;
 
         // attempt to get the starting position
         int x = Random.Range(0, matrixTile.Cols);
@@ -227,7 +224,7 @@ public sealed partial class GridManager : MonoBehaviour
                 Vector2 worldPosition = GridToWorldPoint(x, y);
                 GameObject obj;
 
-                if (value == lowestNewTileValue)
+                if (value == newTimeValue.Lowest)
                     obj = SimplePool.Spawn(tilePrefabs[0], worldPosition, transform.rotation);
                 else
                     obj = SimplePool.Spawn(tilePrefabs[1], worldPosition, transform.rotation);
