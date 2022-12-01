@@ -1,5 +1,5 @@
 # 2048-HyperCasualOffline
- 
+
 <p align="center">
   <a>
     <img alt="Made With Unity" src="https://img.shields.io/badge/made%20with-Unity-57b9d3.svg?logo=Unity">
@@ -26,3 +26,6 @@
     <img alt="GitHub user stars" src="https://img.shields.io/github/stars/RimuruDev?affiliations=OWNER&branch=master&label=User%20Stars&logo=GitHub&logoColor=ffffff&labelColor=282828&color=informational&style=flat">
   </a>
 </p>
+
+ ![Logo](https://user-images.githubusercontent.com/85500556/205096707-cffc8d24-ce1b-45a5-8130-9a81ec366a3a.png)
+ 
