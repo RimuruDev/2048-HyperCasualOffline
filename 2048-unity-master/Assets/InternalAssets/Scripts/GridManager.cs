@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public sealed partial class GridManager : MonoBehaviour
 {
-    public System.Action OnSpawnNewTile;
-
     [Header("Settings")]
     public Score score;
     public MatrixTile matrixTile;
@@ -156,11 +155,9 @@ public sealed partial class GridManager : MonoBehaviour
          new(x + spacingOffset.Horizontal + border.Spacing * x,
             -y + spacingOffset.Vertical - border.Spacing * y);
 
-
     private Vector2 WorldToGridPoint(float x, float y) =>
         new((x - spacingOffset.Horizontal) / (1 + border.Spacing),
             (y - spacingOffset.Vertical) / -(1 + border.Spacing));
-
 
     private bool CheckForMovesLeft()
     {
@@ -505,6 +502,8 @@ public sealed partial class GridManager : MonoBehaviour
 
     public void Reset()
     {
+        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+        /*
         gameDataContainer.DefeatPopup.popup.SetActive(false);
         foreach (var tile in tiles)
         {
@@ -515,6 +514,7 @@ public sealed partial class GridManager : MonoBehaviour
         points = 0;
         gameDataContainer.ScoreText.Current.text = "0";
         state = State.Loaded;
+        */
     }
 
     private void UpgradeTile(GameObject toDestroy, Tile destroyTile, GameObject toUpgrade, Tile upgradeTile)
@@ -542,61 +542,6 @@ public sealed partial class GridManager : MonoBehaviour
 }
 
 public sealed class MoverHandler
-{/*
-    public void MoveUp()
-    {
-        for (int y = 0; y < matrixTile.Rows; y++)// for (int y = 1; y < matrixTile.Rows; y++)
-        {
-            for (int x = 0; x < matrixTile.Cols; x++)
-            {
-                GameObject obj = GetObjectAtGridPosition(x, y);
+{
 
-                if (obj == noTile) continue;
-
-                Vector2 raycastOrigin = obj.transform.position;
-                raycastOrigin.y += halfTileWidth;
-                RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, Vector2.up, Mathf.Infinity);
-
-                if (hit.collider != null)
-                {
-                    GameObject hitObject = hit.collider.gameObject;
-                    if (hitObject != obj)
-                    {
-                        if (hitObject.CompareTag("Tile"))
-                        {
-                            Tile thatTile = hitObject.GetComponent<Tile>();
-                            Tile thisTile = obj.GetComponent<Tile>();
-                            if (CanUpgrade(thisTile, thatTile))
-                            {
-                                UpgradeTile(obj, thisTile, hitObject, thatTile);
-                                hasMoved = true;
-                            }
-                            else
-                            {
-                                Vector3 newPosition = hitObject.transform.position;
-                                newPosition.y -= spaceBetweenTiles;
-                                if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
-                                {
-                                    obj.transform.position = newPosition;
-                                    //obj.transform.position = Vector3.MoveTowards(obj.transform.position, newPosition, Time.deltaTime * 2);
-                                    hasMoved = true;
-                                }
-                            }
-                        }
-                        else if (hitObject.CompareTag("Border"))
-                        {
-                            Vector3 newPosition = obj.transform.position;
-                            newPosition.y = hit.point.y - halfTileWidth - borderOffset;
-                            if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
-                            {
-                                obj.transform.position = newPosition;
-                                hasMoved = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    */
 }
