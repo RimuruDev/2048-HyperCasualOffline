@@ -7,9 +7,6 @@ public sealed partial class GridManager : MonoBehaviour
 {
     public System.Action OnSpawnNewTile;
 
-    public Vector3 Entry = new(0.25f, 0.25f, 1f);
-    public Vector3 Upgrade;
-    public int maxValue = 2048;
     public GameObject gameOverPanel;
     public GameObject noTile;
     public Text scoreText;
@@ -17,15 +14,12 @@ public sealed partial class GridManager : MonoBehaviour
     public LayerMask backgroundLayer;
     public float minSwipeDistance = 10.0f;
 
+    public Score score;
     public MatrixTile matrixTile;
     public NewTimeValue newTimeValue;
+    public SpacingOffset spacingOffset;
+    public Border border;
 
-    private static float borderOffset = 0.05f;
-
-    private static float horizontalSpacingOffset = -1.65f;
-    private static float verticalSpacingOffset = 1.65f;
-
-    private static float borderSpacing = 0.1f;
     private static float halfTileWidth = 0.55f;
     private static float spaceBetweenTiles = 1.1f;
 
@@ -155,16 +149,16 @@ public sealed partial class GridManager : MonoBehaviour
         }
     }
 
-    private static Vector2 GridToWorldPoint(int x, int y)
+    private Vector2 GridToWorldPoint(int x, int y)
     {
-        return new Vector2(x + horizontalSpacingOffset + borderSpacing * x,
-                           -y + verticalSpacingOffset - borderSpacing * y);
+        return new Vector2(x + spacingOffset.Horizontal + border.Spacing * x,
+                           -y + spacingOffset.Vertical - border.Spacing * y);
     }
 
-    private static Vector2 WorldToGridPoint(float x, float y)
+    private Vector2 WorldToGridPoint(float x, float y)
     {
-        return new Vector2((x - horizontalSpacingOffset) / (1 + borderSpacing),
-                           (y - verticalSpacingOffset) / -(1 + borderSpacing));
+        return new Vector2((x - spacingOffset.Horizontal) / (1 + border.Spacing),
+                           (y - spacingOffset.Vertical) / -(1 + border.Spacing));
     }
 
     private bool CheckForMovesLeft()
@@ -250,7 +244,7 @@ public sealed partial class GridManager : MonoBehaviour
 
     private GameObject GetObjectAtGridPosition(int x, int y)
     {
-        RaycastHit2D hit = Physics2D.Raycast(GridToWorldPoint(x, y), Vector2.right, borderSpacing);
+        RaycastHit2D hit = Physics2D.Raycast(GridToWorldPoint(x, y), Vector2.right, border.Spacing);
 
         if (hit && hit.collider.gameObject.GetComponent<Tile>() != null)
             return hit.collider.gameObject;
@@ -302,7 +296,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.y = hit.point.y - halfTileWidth - borderOffset;
+                            newPosition.y = hit.point.y - halfTileWidth - border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                             {
                                 obj.transform.position = newPosition;
@@ -362,7 +356,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.y = hit.point.y + halfTileWidth + borderOffset;
+                            newPosition.y = hit.point.y + halfTileWidth + border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                             {
                                 obj.transform.position = newPosition;
@@ -422,7 +416,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.x = hit.point.x + halfTileWidth + borderOffset;
+                            newPosition.x = hit.point.x + halfTileWidth + border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.x, newPosition.x))
                             {
                                 obj.transform.position = newPosition;
@@ -482,7 +476,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.x = hit.point.x - halfTileWidth - borderOffset;
+                            newPosition.x = hit.point.x - halfTileWidth - border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.x, newPosition.x))
                             {
                                 obj.transform.position = newPosition;
@@ -499,7 +493,7 @@ public sealed partial class GridManager : MonoBehaviour
 
     private bool CanUpgrade(Tile thisTile, Tile thatTile)
     {
-        return (thisTile.value != maxValue && thisTile.power == thatTile.power && !thisTile.upgradedThisTurn && !thatTile.upgradedThisTurn);
+        return (thisTile.value != score.MaxScore && thisTile.power == thatTile.power && !thisTile.upgradedThisTurn && !thatTile.upgradedThisTurn);
     }
 
     private void ReadyTilesForUpgrading()

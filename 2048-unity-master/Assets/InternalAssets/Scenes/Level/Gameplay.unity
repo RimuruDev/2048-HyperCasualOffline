@@ -2121,9 +2121,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57586050a64bb3d4aa56fe142019f47f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Entry: {x: 0.25, y: 0.25, z: 1}
-  Upgrade: {x: 0, y: 0, z: 0}
-  maxValue: 1024
   gameOverPanel: {fileID: 999796184}
   noTile: {fileID: 135876, guid: a75f7d8cc56b74672984c18c4b744c73, type: 3}
   scoreText: {fileID: 1297970829}
@@ -2143,12 +2140,21 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   minSwipeDistance: 10
+  score:
+    MaxScore: 2048
+    MinScore: 0
   matrixTile:
     Rows: 4
     Cols: 4
   newTimeValue:
     Lowest: 2
     Highes: 4
+  spacingOffset:
+    Horizontal: -1.65
+    Vertical: 1.65
+  border:
+    Offset: 0.05
+    Spacing: 0.1
 --- !u!1 &1336197130
 GameObject:
   m_ObjectHideFlags: 0
