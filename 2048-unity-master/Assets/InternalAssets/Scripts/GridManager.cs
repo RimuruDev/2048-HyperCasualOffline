@@ -1,52 +1,49 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public sealed partial class GridManager : MonoBehaviour
 {
-    public System.Action OnSpawnNewTile;
+    [Header("Settings")]
+    public Score score;
+    public MatrixTile matrixTile;
+    public NewTimeValue newTimeValue;
+    public SpacingOffset spacingOffset;
+    public Border border;
 
-    public Vector3 Entry = new(0.25f, 0.25f, 1f);
-    public Vector3 Upgrade;
-    public int maxValue = 2048;
-    public GameObject gameOverPanel;
-    public GameObject noTile;
-    public Text scoreText;
-    public GameObject[] tilePrefabs;
+    [Header("Others")]
+    public GameDataContainer gameDataContainer;
     public LayerMask backgroundLayer;
     public float minSwipeDistance = 10.0f;
 
-    private static int rows = 4;
-    private static int cols = 4;
-    private static int lowestNewTileValue = 2;
-    private static int highestNewTileValue = 4;
-    private static float borderOffset = 0.05f;
-    private static float horizontalSpacingOffset = -1.65f;
-    private static float verticalSpacingOffset = 1.65f;
-    private static float borderSpacing = 0.1f;
-    private static float halfTileWidth = 0.55f;
-    private static float spaceBetweenTiles = 1.1f;
+    private float halfTileWidth = 0.55f;
+    private float spaceBetweenTiles = 1.1f;
 
     private int points;
+
     private List<GameObject> tiles;
     private Rect resetButton;
     private Rect gameOverButton;
     private Vector2 touchStartPosition = Vector2.zero;
 
-    private State state;
+    [SerializeField] private State state;
 
-    void Awake()
+    private void Awake()
     {
+        if (gameDataContainer == null)
+            gameDataContainer = FindObjectOfType<GameDataContainer>();
+
         tiles = new List<GameObject>();
         state = State.Loaded;
     }
 
-    void Update()
+    private void Update()
     {
         if (state == State.GameOver)
         {
-            gameOverPanel.SetActive(true);
+            gameDataContainer.DefeatPopup.popup.SetActive(true);
         }
         else if (state == State.Loaded)
         {
@@ -57,39 +54,39 @@ public sealed partial class GridManager : MonoBehaviour
         else if (state == State.WaitingForInput)
         {
 #if UNITY_STANDALONE
-            if (Input.GetButtonDown("Left"))
+            if (Input.GetButtonDown(Tag.Left))
             {
                 if (MoveTilesLeft())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Right"))
+            else if (Input.GetButtonDown(Tag.Right))
             {
                 if (MoveTilesRight())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Up"))
+            else if (Input.GetButtonDown(Tag.Up))
             {
                 if (MoveTilesUp())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Down"))
+            else if (Input.GetButtonDown(Tag.Down))
             {
                 if (MoveTilesDown())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Reset"))
+            else if (Input.GetButtonDown(Tag.Reset))
             {
                 Reset();
             }
-            else if (Input.GetButtonDown("Quit"))
+            else if (Input.GetButtonDown(Tag.Quit))
             {
                 Application.Quit();
             }
@@ -154,38 +151,31 @@ public sealed partial class GridManager : MonoBehaviour
         }
     }
 
-    private static Vector2 GridToWorldPoint(int x, int y)
-    {
-        return new Vector2(x + horizontalSpacingOffset + borderSpacing * x,
-                           -y + verticalSpacingOffset - borderSpacing * y);
-    }
+    private Vector2 GridToWorldPoint(int x, int y) =>
+         new(x + spacingOffset.Horizontal + border.Spacing * x,
+            -y + spacingOffset.Vertical - border.Spacing * y);
 
-    private static Vector2 WorldToGridPoint(float x, float y)
-    {
-        return new Vector2((x - horizontalSpacingOffset) / (1 + borderSpacing),
-                           (y - verticalSpacingOffset) / -(1 + borderSpacing));
-    }
+    private Vector2 WorldToGridPoint(float x, float y) =>
+        new((x - spacingOffset.Horizontal) / (1 + border.Spacing),
+            (y - spacingOffset.Vertical) / -(1 + border.Spacing));
 
     private bool CheckForMovesLeft()
     {
-        if (tiles.Count < rows * cols)
-        {
-            return true;
-        }
+        if (tiles.Count < matrixTile.Rows * matrixTile.Cols) return true;
 
-        for (int x = 0; x < cols; x++)
+        for (int x = 0; x < matrixTile.Cols; x++)
         {
-            for (int y = 0; y < rows; y++)
+            for (int y = 0; y < matrixTile.Rows; y++)
             {
                 Tile currentTile = GetObjectAtGridPosition(x, y).GetComponent<Tile>();
                 Tile rightTile = GetObjectAtGridPosition(x + 1, y).GetComponent<Tile>();
                 Tile downTile = GetObjectAtGridPosition(x, y + 1).GetComponent<Tile>();
 
-                if (x != cols - 1 && currentTile.value == rightTile.value)
+                if (x != matrixTile.Cols - 1 && currentTile.value == rightTile.value)
                 {
                     return true;
                 }
-                else if (y != rows - 1 && currentTile.value == downTile.value)
+                else if (y != matrixTile.Rows - 1 && currentTile.value == downTile.value)
                 {
                     return true;
                 }
@@ -196,7 +186,7 @@ public sealed partial class GridManager : MonoBehaviour
 
     public void GenerateRandomTile()
     {
-        if (tiles.Count >= rows * cols)
+        if (tiles.Count >= matrixTile.Rows * matrixTile.Cols)
             throw new UnityException("Unable to create new tile - grid is already full");
 
         int value;
@@ -204,29 +194,29 @@ public sealed partial class GridManager : MonoBehaviour
         float highOrLowChance = Random.Range(0f, 0.99f);
 
         if (highOrLowChance >= 0.9f)
-            value = highestNewTileValue;
+            value = newTimeValue.Highes;
         else
-            value = lowestNewTileValue;
+            value = newTimeValue.Lowest;
 
         // attempt to get the starting position
-        int x = Random.Range(0, cols);
-        int y = Random.Range(0, rows);
+        int x = Random.Range(0, matrixTile.Cols);
+        int y = Random.Range(0, matrixTile.Rows);
 
         // starting from the random starting position, loop through
         // each cell in the grid until we find an empty positio
         bool found = false;
         while (!found)
         {
-            if (GetObjectAtGridPosition(x, y) == noTile)
+            if (GetObjectAtGridPosition(x, y) == gameDataContainer.EmptyTile)
             {
                 found = true;
                 Vector2 worldPosition = GridToWorldPoint(x, y);
                 GameObject obj;
 
-                if (value == lowestNewTileValue)
-                    obj = SimplePool.Spawn(tilePrefabs[0], worldPosition, transform.rotation);
+                if (value == newTimeValue.Lowest)
+                    obj = SimplePool.Spawn(gameDataContainer.tilePrefabs[0], worldPosition, transform.rotation);
                 else
-                    obj = SimplePool.Spawn(tilePrefabs[1], worldPosition, transform.rotation);
+                    obj = SimplePool.Spawn(gameDataContainer.tilePrefabs[1], worldPosition, transform.rotation);
 
                 tiles.Add(obj);
                 TileAnimationHandler tileAnimManager = obj.GetComponent<TileAnimationHandler>();
@@ -234,13 +224,13 @@ public sealed partial class GridManager : MonoBehaviour
             }
 
             x++;
-            if (x >= cols)
+            if (x >= matrixTile.Cols)
             {
                 y++;
                 x = 0;
             }
 
-            if (y >= rows)
+            if (y >= matrixTile.Rows)
             {
                 y = 0;
             }
@@ -249,24 +239,24 @@ public sealed partial class GridManager : MonoBehaviour
 
     private GameObject GetObjectAtGridPosition(int x, int y)
     {
-        RaycastHit2D hit = Physics2D.Raycast(GridToWorldPoint(x, y), Vector2.right, borderSpacing);
+        RaycastHit2D hit = Physics2D.Raycast(GridToWorldPoint(x, y), Vector2.right, border.Spacing);
 
         if (hit && hit.collider.gameObject.GetComponent<Tile>() != null)
             return hit.collider.gameObject;
         else
-            return noTile;
+            return gameDataContainer.EmptyTile;
     }
 
     private bool MoveTilesUp()
     {
         bool hasMoved = false;
-        for (int y = 0; y < rows; y++)// for (int y = 1; y < rows; y++)
+        for (int y = 0; y < matrixTile.Rows; y++)// for (int y = 1; y < matrixTile.Rows; y++)
         {
-            for (int x = 0; x < cols; x++)
+            for (int x = 0; x < matrixTile.Cols; x++)
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile) continue;
+                if (obj == gameDataContainer.EmptyTile) continue;
 
                 Vector2 raycastOrigin = obj.transform.position;
                 raycastOrigin.y += halfTileWidth;
@@ -292,7 +282,6 @@ public sealed partial class GridManager : MonoBehaviour
                                 newPosition.y -= spaceBetweenTiles;
                                 if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                                 {
-                                    Debug.Log("R");
                                     obj.transform.position = newPosition;
                                     //obj.transform.position = Vector3.MoveTowards(obj.transform.position, newPosition, Time.deltaTime * 2);
                                     hasMoved = true;
@@ -302,7 +291,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.y = hit.point.y - halfTileWidth - borderOffset;
+                            newPosition.y = hit.point.y - halfTileWidth - border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                             {
                                 obj.transform.position = newPosition;
@@ -320,13 +309,13 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesDown()
     {
         bool hasMoved = false;
-        for (int y = rows - 1; y >= 0; y--)
+        for (int y = matrixTile.Rows - 1; y >= 0; y--)
         {
-            for (int x = 0; x < cols; x++)
+            for (int x = 0; x < matrixTile.Cols; x++)
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
+                if (obj == gameDataContainer.EmptyTile)
                 {
                     continue;
                 }
@@ -362,7 +351,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.y = hit.point.y + halfTileWidth + borderOffset;
+                            newPosition.y = hit.point.y + halfTileWidth + border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                             {
                                 obj.transform.position = newPosition;
@@ -380,13 +369,13 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesLeft()
     {
         bool hasMoved = false;
-        for (int x = 0; x < cols; x++)//  3 loop //for (int x = 1; x < cols; x++)
+        for (int x = 0; x < matrixTile.Cols; x++)//  3 loop //for (int x = 1; x < matrixTile.Cols; x++)
         {
-            for (int y = 0; y < rows; y++) // 4 loop
+            for (int y = 0; y < matrixTile.Rows; y++) // 4 loop
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
+                if (obj == gameDataContainer.EmptyTile)
                 {
                     continue;
                 }
@@ -422,7 +411,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.x = hit.point.x + halfTileWidth + borderOffset;
+                            newPosition.x = hit.point.x + halfTileWidth + border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.x, newPosition.x))
                             {
                                 obj.transform.position = newPosition;
@@ -440,13 +429,13 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesRight()
     {
         bool hasMoved = false;
-        for (int x = cols - 1; x >= 0; x--) // 3 loop
+        for (int x = matrixTile.Cols - 1; x >= 0; x--) // 3 loop
         {
-            for (int y = 0; y < rows; y++) // 4 loop
+            for (int y = 0; y < matrixTile.Rows; y++) // 4 loop
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
+                if (obj == gameDataContainer.EmptyTile)
                 {
                     continue;
                 }
@@ -482,7 +471,7 @@ public sealed partial class GridManager : MonoBehaviour
                         else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
-                            newPosition.x = hit.point.x - halfTileWidth - borderOffset;
+                            newPosition.x = hit.point.x - halfTileWidth - border.Offset;
                             if (!Mathf.Approximately(obj.transform.position.x, newPosition.x))
                             {
                                 obj.transform.position = newPosition;
@@ -499,7 +488,7 @@ public sealed partial class GridManager : MonoBehaviour
 
     private bool CanUpgrade(Tile thisTile, Tile thatTile)
     {
-        return (thisTile.value != maxValue && thisTile.power == thatTile.power && !thisTile.upgradedThisTurn && !thatTile.upgradedThisTurn);
+        return (thisTile.value != score.MaxScore && thisTile.power == thatTile.power && !thisTile.upgradedThisTurn && !thatTile.upgradedThisTurn);
     }
 
     private void ReadyTilesForUpgrading()
@@ -513,7 +502,9 @@ public sealed partial class GridManager : MonoBehaviour
 
     public void Reset()
     {
-        gameOverPanel.SetActive(false);
+        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+        /*
+        gameDataContainer.DefeatPopup.popup.SetActive(false);
         foreach (var tile in tiles)
         {
             SimplePool.Despawn(tile);
@@ -521,8 +512,9 @@ public sealed partial class GridManager : MonoBehaviour
 
         tiles.Clear();
         points = 0;
-        scoreText.text = "0";
+        gameDataContainer.ScoreText.Current.text = "0";
         state = State.Loaded;
+        */
     }
 
     private void UpgradeTile(GameObject toDestroy, Tile destroyTile, GameObject toUpgrade, Tile upgradeTile)
@@ -536,15 +528,20 @@ public sealed partial class GridManager : MonoBehaviour
         SimplePool.Despawn(toUpgrade);
 
         // create the upgraded tile
-        GameObject newTile = SimplePool.Spawn(tilePrefabs[upgradeTile.power], toUpgradePosition, transform.rotation);
+        GameObject newTile = SimplePool.Spawn(gameDataContainer.tilePrefabs[upgradeTile.power], toUpgradePosition, transform.rotation);
         tiles.Add(newTile);
         Tile tile = newTile.GetComponent<Tile>();
         tile.upgradedThisTurn = true;
 
         points += upgradeTile.value * 2;
-        scoreText.text = points.ToString();
+        gameDataContainer.ScoreText.Current.text = points.ToString();
 
         TileAnimationHandler tileAnim = newTile.GetComponent<TileAnimationHandler>();
         tileAnim.AnimateUpgrade();
     }
+}
+
+public sealed class MoverHandler
+{
+
 }
