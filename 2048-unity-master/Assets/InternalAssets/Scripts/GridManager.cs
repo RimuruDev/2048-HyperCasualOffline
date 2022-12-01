@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
+using System;
 
 public sealed partial class GridManager : MonoBehaviour
 {
@@ -17,8 +19,10 @@ public sealed partial class GridManager : MonoBehaviour
     public LayerMask backgroundLayer;
     public float minSwipeDistance = 10.0f;
 
-    private static int rows = 4;
-    private static int cols = 4;
+    public MatrixTile matrixTile;
+    
+    //private static int rows_ = 4;
+    //private static int cols_ = 4;
     private static int lowestNewTileValue = 2;
     private static int highestNewTileValue = 4;
     private static float borderOffset = 0.05f;
@@ -168,24 +172,24 @@ public sealed partial class GridManager : MonoBehaviour
 
     private bool CheckForMovesLeft()
     {
-        if (tiles.Count < rows * cols)
+        if (tiles.Count < matrixTile.Rows * matrixTile.Cols)
         {
             return true;
         }
 
-        for (int x = 0; x < cols; x++)
+        for (int x = 0; x < matrixTile.Cols; x++)
         {
-            for (int y = 0; y < rows; y++)
+            for (int y = 0; y < matrixTile.Rows; y++)
             {
                 Tile currentTile = GetObjectAtGridPosition(x, y).GetComponent<Tile>();
                 Tile rightTile = GetObjectAtGridPosition(x + 1, y).GetComponent<Tile>();
                 Tile downTile = GetObjectAtGridPosition(x, y + 1).GetComponent<Tile>();
 
-                if (x != cols - 1 && currentTile.value == rightTile.value)
+                if (x != matrixTile.Cols - 1 && currentTile.value == rightTile.value)
                 {
                     return true;
                 }
-                else if (y != rows - 1 && currentTile.value == downTile.value)
+                else if (y != matrixTile.Rows - 1 && currentTile.value == downTile.value)
                 {
                     return true;
                 }
@@ -196,7 +200,7 @@ public sealed partial class GridManager : MonoBehaviour
 
     public void GenerateRandomTile()
     {
-        if (tiles.Count >= rows * cols)
+        if (tiles.Count >= matrixTile.Rows * matrixTile.Cols)
             throw new UnityException("Unable to create new tile - grid is already full");
 
         int value;
@@ -209,8 +213,8 @@ public sealed partial class GridManager : MonoBehaviour
             value = lowestNewTileValue;
 
         // attempt to get the starting position
-        int x = Random.Range(0, cols);
-        int y = Random.Range(0, rows);
+        int x = Random.Range(0, matrixTile.Cols);
+        int y = Random.Range(0, matrixTile.Rows);
 
         // starting from the random starting position, loop through
         // each cell in the grid until we find an empty positio
@@ -234,13 +238,13 @@ public sealed partial class GridManager : MonoBehaviour
             }
 
             x++;
-            if (x >= cols)
+            if (x >= matrixTile.Cols)
             {
                 y++;
                 x = 0;
             }
 
-            if (y >= rows)
+            if (y >= matrixTile.Rows)
             {
                 y = 0;
             }
@@ -260,9 +264,9 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesUp()
     {
         bool hasMoved = false;
-        for (int y = 0; y < rows; y++)// for (int y = 1; y < rows; y++)
+        for (int y = 0; y < matrixTile.Rows; y++)// for (int y = 1; y < matrixTile.Rows; y++)
         {
-            for (int x = 0; x < cols; x++)
+            for (int x = 0; x < matrixTile.Cols; x++)
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
@@ -292,7 +296,6 @@ public sealed partial class GridManager : MonoBehaviour
                                 newPosition.y -= spaceBetweenTiles;
                                 if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                                 {
-                                    Debug.Log("R");
                                     obj.transform.position = newPosition;
                                     //obj.transform.position = Vector3.MoveTowards(obj.transform.position, newPosition, Time.deltaTime * 2);
                                     hasMoved = true;
@@ -320,9 +323,9 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesDown()
     {
         bool hasMoved = false;
-        for (int y = rows - 1; y >= 0; y--)
+        for (int y = matrixTile.Rows - 1; y >= 0; y--)
         {
-            for (int x = 0; x < cols; x++)
+            for (int x = 0; x < matrixTile.Cols; x++)
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
@@ -380,9 +383,9 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesLeft()
     {
         bool hasMoved = false;
-        for (int x = 0; x < cols; x++)//  3 loop //for (int x = 1; x < cols; x++)
+        for (int x = 0; x < matrixTile.Cols; x++)//  3 loop //for (int x = 1; x < matrixTile.Cols; x++)
         {
-            for (int y = 0; y < rows; y++) // 4 loop
+            for (int y = 0; y < matrixTile.Rows; y++) // 4 loop
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
@@ -440,9 +443,9 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesRight()
     {
         bool hasMoved = false;
-        for (int x = cols - 1; x >= 0; x--) // 3 loop
+        for (int x = matrixTile.Cols - 1; x >= 0; x--) // 3 loop
         {
-            for (int y = 0; y < rows; y++) // 4 loop
+            for (int y = 0; y < matrixTile.Rows; y++) // 4 loop
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
@@ -547,4 +550,64 @@ public sealed partial class GridManager : MonoBehaviour
         TileAnimationHandler tileAnim = newTile.GetComponent<TileAnimationHandler>();
         tileAnim.AnimateUpgrade();
     }
+}
+
+public sealed class MoverHandler
+{/*
+    public void MoveUp()
+    {
+        for (int y = 0; y < matrixTile.Rows; y++)// for (int y = 1; y < matrixTile.Rows; y++)
+        {
+            for (int x = 0; x < matrixTile.Cols; x++)
+            {
+                GameObject obj = GetObjectAtGridPosition(x, y);
+
+                if (obj == noTile) continue;
+
+                Vector2 raycastOrigin = obj.transform.position;
+                raycastOrigin.y += halfTileWidth;
+                RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, Vector2.up, Mathf.Infinity);
+
+                if (hit.collider != null)
+                {
+                    GameObject hitObject = hit.collider.gameObject;
+                    if (hitObject != obj)
+                    {
+                        if (hitObject.CompareTag("Tile"))
+                        {
+                            Tile thatTile = hitObject.GetComponent<Tile>();
+                            Tile thisTile = obj.GetComponent<Tile>();
+                            if (CanUpgrade(thisTile, thatTile))
+                            {
+                                UpgradeTile(obj, thisTile, hitObject, thatTile);
+                                hasMoved = true;
+                            }
+                            else
+                            {
+                                Vector3 newPosition = hitObject.transform.position;
+                                newPosition.y -= spaceBetweenTiles;
+                                if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
+                                {
+                                    obj.transform.position = newPosition;
+                                    //obj.transform.position = Vector3.MoveTowards(obj.transform.position, newPosition, Time.deltaTime * 2);
+                                    hasMoved = true;
+                                }
+                            }
+                        }
+                        else if (hitObject.CompareTag("Border"))
+                        {
+                            Vector3 newPosition = obj.transform.position;
+                            newPosition.y = hit.point.y - halfTileWidth - borderOffset;
+                            if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
+                            {
+                                obj.transform.position = newPosition;
+                                hasMoved = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    */
 }
