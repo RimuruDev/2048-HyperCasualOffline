@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
-
-[Serializable]
-public struct Tag
-{
-    public const string Left = "Left";
-    public const string Right = "Right";
-    public const string Up = "Up";
-    public const string Down = "Down";
-
-    public const string Quit = "Quit";
-    public const string Reset = "Reset";
-}
 
 public sealed partial class GridManager : MonoBehaviour
 {
@@ -28,26 +15,27 @@ public sealed partial class GridManager : MonoBehaviour
     public Border border;
 
     [Header("Others")]
-    public GameObject gameOverPanel;
-    public GameObject noTile;
-    public Text scoreText;
-    public GameObject[] tilePrefabs;
+    public GameDataContainer gameDataContainer;
     public LayerMask backgroundLayer;
     public float minSwipeDistance = 10.0f;
 
-    private static float halfTileWidth = 0.55f;
-    private static float spaceBetweenTiles = 1.1f;
+    [Header("Debug")]
+    [SerializeField] private float halfTileWidth = 0.55f;
+    [SerializeField] private float spaceBetweenTiles = 1.1f;
 
-    private int points;
-    private List<GameObject> tiles;
-    private Rect resetButton;
-    private Rect gameOverButton;
-    private Vector2 touchStartPosition = Vector2.zero;
+    [SerializeField] private int points;
+    [SerializeField] private List<GameObject> tiles;
+    [SerializeField] private Rect resetButton;
+    [SerializeField] private Rect gameOverButton;
+    [SerializeField] private Vector2 touchStartPosition = Vector2.zero;
 
-    private State state;
+    [SerializeField] private State state;
 
     private void Awake()
     {
+        if (gameDataContainer == null)
+            gameDataContainer = FindObjectOfType<GameDataContainer>();
+
         tiles = new List<GameObject>();
         state = State.Loaded;
     }
@@ -56,7 +44,7 @@ public sealed partial class GridManager : MonoBehaviour
     {
         if (state == State.GameOver)
         {
-            gameOverPanel.SetActive(true);
+            gameDataContainer.DefeatPopup.popup.SetActive(true);
         }
         else if (state == State.Loaded)
         {
@@ -222,16 +210,16 @@ public sealed partial class GridManager : MonoBehaviour
         bool found = false;
         while (!found)
         {
-            if (GetObjectAtGridPosition(x, y) == noTile)
+            if (GetObjectAtGridPosition(x, y) == gameDataContainer.EmptyTile)
             {
                 found = true;
                 Vector2 worldPosition = GridToWorldPoint(x, y);
                 GameObject obj;
 
                 if (value == newTimeValue.Lowest)
-                    obj = SimplePool.Spawn(tilePrefabs[0], worldPosition, transform.rotation);
+                    obj = SimplePool.Spawn(gameDataContainer.tilePrefabs[0], worldPosition, transform.rotation);
                 else
-                    obj = SimplePool.Spawn(tilePrefabs[1], worldPosition, transform.rotation);
+                    obj = SimplePool.Spawn(gameDataContainer.tilePrefabs[1], worldPosition, transform.rotation);
 
                 tiles.Add(obj);
                 TileAnimationHandler tileAnimManager = obj.GetComponent<TileAnimationHandler>();
@@ -259,7 +247,7 @@ public sealed partial class GridManager : MonoBehaviour
         if (hit && hit.collider.gameObject.GetComponent<Tile>() != null)
             return hit.collider.gameObject;
         else
-            return noTile;
+            return gameDataContainer.EmptyTile;
     }
 
     private bool MoveTilesUp()
@@ -271,7 +259,7 @@ public sealed partial class GridManager : MonoBehaviour
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile) continue;
+                if (obj == gameDataContainer.EmptyTile) continue;
 
                 Vector2 raycastOrigin = obj.transform.position;
                 raycastOrigin.y += halfTileWidth;
@@ -330,7 +318,7 @@ public sealed partial class GridManager : MonoBehaviour
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
+                if (obj == gameDataContainer.EmptyTile)
                 {
                     continue;
                 }
@@ -390,7 +378,7 @@ public sealed partial class GridManager : MonoBehaviour
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
+                if (obj == gameDataContainer.EmptyTile)
                 {
                     continue;
                 }
@@ -450,7 +438,7 @@ public sealed partial class GridManager : MonoBehaviour
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
+                if (obj == gameDataContainer.EmptyTile)
                 {
                     continue;
                 }
@@ -517,7 +505,7 @@ public sealed partial class GridManager : MonoBehaviour
 
     public void Reset()
     {
-        gameOverPanel.SetActive(false);
+        gameDataContainer.DefeatPopup.popup.SetActive(false);
         foreach (var tile in tiles)
         {
             SimplePool.Despawn(tile);
@@ -525,7 +513,7 @@ public sealed partial class GridManager : MonoBehaviour
 
         tiles.Clear();
         points = 0;
-        scoreText.text = "0";
+        gameDataContainer.ScoreText.Current.text = "0";
         state = State.Loaded;
     }
 
@@ -540,13 +528,13 @@ public sealed partial class GridManager : MonoBehaviour
         SimplePool.Despawn(toUpgrade);
 
         // create the upgraded tile
-        GameObject newTile = SimplePool.Spawn(tilePrefabs[upgradeTile.power], toUpgradePosition, transform.rotation);
+        GameObject newTile = SimplePool.Spawn(gameDataContainer.tilePrefabs[upgradeTile.power], toUpgradePosition, transform.rotation);
         tiles.Add(newTile);
         Tile tile = newTile.GetComponent<Tile>();
         tile.upgradedThisTurn = true;
 
         points += upgradeTile.value * 2;
-        scoreText.text = points.ToString();
+        gameDataContainer.ScoreText.Current.text = points.ToString();
 
         TileAnimationHandler tileAnim = newTile.GetComponent<TileAnimationHandler>();
         tileAnim.AnimateUpgrade();
