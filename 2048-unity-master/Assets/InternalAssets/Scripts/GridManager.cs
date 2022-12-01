@@ -294,7 +294,7 @@ public sealed partial class GridManager : MonoBehaviour
                     GameObject hitObject = hit.collider.gameObject;
                     if (hitObject != obj)
                     {
-                        if (hitObject.tag == "Tile")
+                        if (hitObject.CompareTag("Tile"))
                         {
                             Tile thatTile = hitObject.GetComponent<Tile>();
                             Tile thisTile = obj.GetComponent<Tile>();
@@ -314,7 +314,7 @@ public sealed partial class GridManager : MonoBehaviour
                                 }
                             }
                         }
-                        else if (hitObject.tag == "Border")
+                        else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
                             newPosition.y = hit.point.y - halfTileWidth - borderOffset;
@@ -354,7 +354,7 @@ public sealed partial class GridManager : MonoBehaviour
                     GameObject hitObject = hit.collider.gameObject;
                     if (hitObject != obj)
                     {
-                        if (hitObject.tag == "Tile")
+                        if (hitObject.CompareTag("Tile"))
                         {
                             Tile thatTile = hitObject.GetComponent<Tile>();
                             Tile thisTile = obj.GetComponent<Tile>();
@@ -374,7 +374,7 @@ public sealed partial class GridManager : MonoBehaviour
                                 }
                             }
                         }
-                        else if (hitObject.tag == "Border")
+                        else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
                             newPosition.y = hit.point.y + halfTileWidth + borderOffset;
@@ -414,7 +414,7 @@ public sealed partial class GridManager : MonoBehaviour
                     GameObject hitObject = hit.collider.gameObject;
                     if (hitObject != obj)
                     {
-                        if (hitObject.tag == "Tile")
+                        if (hitObject.CompareTag("Tile"))
                         {
                             Tile thatTile = hitObject.GetComponent<Tile>();
                             Tile thisTile = obj.GetComponent<Tile>();
@@ -434,7 +434,7 @@ public sealed partial class GridManager : MonoBehaviour
                                 }
                             }
                         }
-                        else if (hitObject.tag == "Border")
+                        else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
                             newPosition.x = hit.point.x + halfTileWidth + borderOffset;
@@ -474,7 +474,7 @@ public sealed partial class GridManager : MonoBehaviour
                     GameObject hitObject = hit.collider.gameObject;
                     if (hitObject != obj)
                     {
-                        if (hitObject.tag == "Tile")
+                        if (hitObject.CompareTag("Tile"))
                         {
                             Tile thatTile = hitObject.GetComponent<Tile>();
                             Tile thisTile = obj.GetComponent<Tile>();
@@ -494,7 +494,7 @@ public sealed partial class GridManager : MonoBehaviour
                                 }
                             }
                         }
-                        else if (hitObject.tag == "Border")
+                        else if (hitObject.CompareTag("Border"))
                         {
                             Vector3 newPosition = obj.transform.position;
                             newPosition.x = hit.point.x - halfTileWidth - borderOffset;
