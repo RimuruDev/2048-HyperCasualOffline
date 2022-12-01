@@ -260,16 +260,6 @@ public sealed partial class GridManager : MonoBehaviour
             return noTile;
     }
 
-    private bool MoveAxis()
-    {
-        bool hasMoved = false;
-        {
-
-        }
-        return hasMoved;
-    }
-
-
     private bool MoveTilesUp()
     {
         bool hasMoved = false;
@@ -284,6 +274,7 @@ public sealed partial class GridManager : MonoBehaviour
                 Vector2 raycastOrigin = obj.transform.position;
                 raycastOrigin.y += halfTileWidth;
                 RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, Vector2.up, Mathf.Infinity);
+
                 if (hit.collider != null)
                 {
                     GameObject hitObject = hit.collider.gameObject;
@@ -305,6 +296,7 @@ public sealed partial class GridManager : MonoBehaviour
                                 if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                                 {
                                     obj.transform.position = newPosition;
+                                    //obj.transform.position = Vector3.MoveTowards(obj.transform.position, newPosition, Time.deltaTime * 2);
                                     hasMoved = true;
                                 }
                             }
@@ -390,9 +382,9 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesLeft()
     {
         bool hasMoved = false;
-        for (int x = 1; x < cols; x++)
+        for (int x = 1; x < cols; x++)//  3 loop
         {
-            for (int y = 0; y < rows; y++)
+            for (int y = 0; y < rows; y++) // 4 loop
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
@@ -450,9 +442,9 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesRight()
     {
         bool hasMoved = false;
-        for (int x = cols - 1; x >= 0; x--)
+        for (int x = cols - 1; x >= 0; x--) // 3 loop
         {
-            for (int y = 0; y < rows; y++)
+            for (int y = 0; y < rows; y++) // 4 loop
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
