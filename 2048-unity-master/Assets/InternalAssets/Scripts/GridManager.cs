@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public sealed partial class GridManager : MonoBehaviour
 {
+    public System.Action OnSpawnNewTile;
+
     public Vector3 Entry = new(0.25f, 0.25f, 1f);
     public Vector3 Upgrade;
     public int maxValue = 2048;
@@ -34,7 +36,6 @@ public sealed partial class GridManager : MonoBehaviour
 
     private State state;
 
-    #region monodevelop
     void Awake()
     {
         tiles = new List<GameObject>();
@@ -152,9 +153,7 @@ public sealed partial class GridManager : MonoBehaviour
             }
         }
     }
-    #endregion
 
-    #region class methods
     private static Vector2 GridToWorldPoint(int x, int y)
     {
         return new Vector2(x + horizontalSpacingOffset + borderSpacing * x,
@@ -166,9 +165,7 @@ public sealed partial class GridManager : MonoBehaviour
         return new Vector2((x - horizontalSpacingOffset) / (1 + borderSpacing),
                            (y - verticalSpacingOffset) / -(1 + borderSpacing));
     }
-    #endregion
 
-    #region private methods
     private bool CheckForMovesLeft()
     {
         if (tiles.Count < rows * cols)
@@ -263,7 +260,7 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesUp()
     {
         bool hasMoved = false;
-        for (int y = 1; y < rows; y++)
+        for (int y = 0; y < rows; y++)// for (int y = 1; y < rows; y++)
         {
             for (int x = 0; x < cols; x++)
             {
@@ -295,6 +292,7 @@ public sealed partial class GridManager : MonoBehaviour
                                 newPosition.y -= spaceBetweenTiles;
                                 if (!Mathf.Approximately(obj.transform.position.y, newPosition.y))
                                 {
+                                    Debug.Log("R");
                                     obj.transform.position = newPosition;
                                     //obj.transform.position = Vector3.MoveTowards(obj.transform.position, newPosition, Time.deltaTime * 2);
                                     hasMoved = true;
@@ -382,7 +380,7 @@ public sealed partial class GridManager : MonoBehaviour
     private bool MoveTilesLeft()
     {
         bool hasMoved = false;
-        for (int x = 1; x < cols; x++)//  3 loop
+        for (int x = 0; x < cols; x++)//  3 loop //for (int x = 1; x < cols; x++)
         {
             for (int y = 0; y < rows; y++) // 4 loop
             {
@@ -549,5 +547,4 @@ public sealed partial class GridManager : MonoBehaviour
         TileAnimationHandler tileAnim = newTile.GetComponent<TileAnimationHandler>();
         tileAnim.AnimateUpgrade();
     }
-    #endregion
 }
