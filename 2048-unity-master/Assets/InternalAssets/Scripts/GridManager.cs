@@ -1,24 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+
+[Serializable]
+public struct Tag
+{
+    public const string Left = "Left";
+    public const string Right = "Right";
+    public const string Up = "Up";
+    public const string Down = "Down";
+
+    public const string Quit = "Quit";
+    public const string Reset = "Reset";
+}
 
 public sealed partial class GridManager : MonoBehaviour
 {
     public System.Action OnSpawnNewTile;
 
+    [Header("Settings")]
+    public Score score;
+    public MatrixTile matrixTile;
+    public NewTimeValue newTimeValue;
+    public SpacingOffset spacingOffset;
+    public Border border;
+
+    [Header("Others")]
     public GameObject gameOverPanel;
     public GameObject noTile;
     public Text scoreText;
     public GameObject[] tilePrefabs;
     public LayerMask backgroundLayer;
     public float minSwipeDistance = 10.0f;
-
-    public Score score;
-    public MatrixTile matrixTile;
-    public NewTimeValue newTimeValue;
-    public SpacingOffset spacingOffset;
-    public Border border;
 
     private static float halfTileWidth = 0.55f;
     private static float spaceBetweenTiles = 1.1f;
@@ -31,13 +46,13 @@ public sealed partial class GridManager : MonoBehaviour
 
     private State state;
 
-    void Awake()
+    private void Awake()
     {
         tiles = new List<GameObject>();
         state = State.Loaded;
     }
 
-    void Update()
+    private void Update()
     {
         if (state == State.GameOver)
         {
@@ -52,39 +67,39 @@ public sealed partial class GridManager : MonoBehaviour
         else if (state == State.WaitingForInput)
         {
 #if UNITY_STANDALONE
-            if (Input.GetButtonDown("Left"))
+            if (Input.GetButtonDown(Tag.Left))
             {
                 if (MoveTilesLeft())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Right"))
+            else if (Input.GetButtonDown(Tag.Right))
             {
                 if (MoveTilesRight())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Up"))
+            else if (Input.GetButtonDown(Tag.Up))
             {
                 if (MoveTilesUp())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Down"))
+            else if (Input.GetButtonDown(Tag.Down))
             {
                 if (MoveTilesDown())
                 {
                     state = State.CheckingMatches;
                 }
             }
-            else if (Input.GetButtonDown("Reset"))
+            else if (Input.GetButtonDown(Tag.Reset))
             {
                 Reset();
             }
-            else if (Input.GetButtonDown("Quit"))
+            else if (Input.GetButtonDown(Tag.Quit))
             {
                 Application.Quit();
             }
@@ -149,24 +164,19 @@ public sealed partial class GridManager : MonoBehaviour
         }
     }
 
-    private Vector2 GridToWorldPoint(int x, int y)
-    {
-        return new Vector2(x + spacingOffset.Horizontal + border.Spacing * x,
-                           -y + spacingOffset.Vertical - border.Spacing * y);
-    }
+    private Vector2 GridToWorldPoint(int x, int y) =>
+         new(x + spacingOffset.Horizontal + border.Spacing * x,
+            -y + spacingOffset.Vertical - border.Spacing * y);
 
-    private Vector2 WorldToGridPoint(float x, float y)
-    {
-        return new Vector2((x - spacingOffset.Horizontal) / (1 + border.Spacing),
-                           (y - spacingOffset.Vertical) / -(1 + border.Spacing));
-    }
+
+    private Vector2 WorldToGridPoint(float x, float y) =>
+        new((x - spacingOffset.Horizontal) / (1 + border.Spacing),
+            (y - spacingOffset.Vertical) / -(1 + border.Spacing));
+
 
     private bool CheckForMovesLeft()
     {
-        if (tiles.Count < matrixTile.Rows * matrixTile.Cols)
-        {
-            return true;
-        }
+        if (tiles.Count < matrixTile.Rows * matrixTile.Cols) return true;
 
         for (int x = 0; x < matrixTile.Cols; x++)
         {
