@@ -200,21 +200,16 @@ public sealed partial class GridManager : MonoBehaviour
     public void GenerateRandomTile()
     {
         if (tiles.Count >= rows * cols)
-        {
             throw new UnityException("Unable to create new tile - grid is already full");
-        }
 
         int value;
         // find out if we are generating a tile with the lowest or highest value
         float highOrLowChance = Random.Range(0f, 0.99f);
+
         if (highOrLowChance >= 0.9f)
-        {
             value = highestNewTileValue;
-        }
         else
-        {
             value = lowestNewTileValue;
-        }
 
         // attempt to get the starting position
         int x = Random.Range(0, cols);
@@ -230,14 +225,11 @@ public sealed partial class GridManager : MonoBehaviour
                 found = true;
                 Vector2 worldPosition = GridToWorldPoint(x, y);
                 GameObject obj;
+
                 if (value == lowestNewTileValue)
-                {
                     obj = SimplePool.Spawn(tilePrefabs[0], worldPosition, transform.rotation);
-                }
                 else
-                {
                     obj = SimplePool.Spawn(tilePrefabs[1], worldPosition, transform.rotation);
-                }
 
                 tiles.Add(obj);
                 TileAnimationHandler tileAnimManager = obj.GetComponent<TileAnimationHandler>();
@@ -263,14 +255,20 @@ public sealed partial class GridManager : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(GridToWorldPoint(x, y), Vector2.right, borderSpacing);
 
         if (hit && hit.collider.gameObject.GetComponent<Tile>() != null)
-        {
             return hit.collider.gameObject;
-        }
         else
-        {
             return noTile;
-        }
     }
+
+    private bool MoveAxis()
+    {
+        bool hasMoved = false;
+        {
+
+        }
+        return hasMoved;
+    }
+
 
     private bool MoveTilesUp()
     {
@@ -281,10 +279,7 @@ public sealed partial class GridManager : MonoBehaviour
             {
                 GameObject obj = GetObjectAtGridPosition(x, y);
 
-                if (obj == noTile)
-                {
-                    continue;
-                }
+                if (obj == noTile) continue;
 
                 Vector2 raycastOrigin = obj.transform.position;
                 raycastOrigin.y += halfTileWidth;
