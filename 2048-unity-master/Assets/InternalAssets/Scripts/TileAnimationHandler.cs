@@ -5,6 +5,7 @@ public sealed class TileAnimationHandler : MonoBehaviour
 {
     public float scaleSpeed;
     public float growSize;
+
     private Transform _transform;
     private Vector3 growVector;
 
@@ -15,21 +16,15 @@ public sealed class TileAnimationHandler : MonoBehaviour
         growVector = new Vector3(growSize, growSize, 0f);
     }
 
-    public void AnimateEntry()
-    {
-         StartCoroutine("AnimationEntry");
-    }
+    public void AnimateEntry() => StartCoroutine(nameof(AnimationEntry));
 
-    public void AnimateUpgrade()
-    {
-         StartCoroutine("AnimationUpgrade");
-    }
+    public void AnimateUpgrade() => StartCoroutine(nameof(AnimationUpgrade));
 
     private IEnumerator AnimationEntry()
     {
         while (_transform == null) yield return null;
 
-        _transform.localScale = new Vector3(0.25f, 0.25f, 1f);
+        _transform.localScale = new Vector3(1f, 1f, 1f);
 
         while (_transform.localScale.x < 1f)
         {

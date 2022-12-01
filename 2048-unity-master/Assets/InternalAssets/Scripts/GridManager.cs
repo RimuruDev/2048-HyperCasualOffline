@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public sealed partial class GridManager : MonoBehaviour
 {
+    public Vector3 Entry = new(0.25f, 0.25f, 1f);
+    public Vector3 Upgrade;
     public int maxValue = 2048;
     public GameObject gameOverPanel;
     public GameObject noTile;
