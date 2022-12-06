@@ -23,9 +23,9 @@
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/RimuruDev/2048-HyperCasualOffline?branch=master&label=Stars&logo=GitHub&logoColor=ffffff&labelColor=282828&color=informational&style=flat">
   </a>
     <a>
-    <img alt="GitHub user stars" src="https://img.shields.io/github/stars/RimuruDev?affiliations=OWNER&branch=master&label=User%20Stars&logo=GitHub&logoColor=ffffff&labelColor=282828&color=informational&style=flat">
+    <img alt="GitHub user stars" src="https://img.shields.io/github/stars/RimuruDev?affiliations=OWNER&branch=main&label=User%20Stars&logo=GitHub&logoColor=ffffff&labelColor=282828&color=informational&style=flat">
   </a>
 </p>
 
  ![Logo](https://user-images.githubusercontent.com/85500556/205096707-cffc8d24-ce1b-45a5-8130-9a81ec366a3a.png)
- 
+ ® 2022 Abyss Moth. All rights reserved.
